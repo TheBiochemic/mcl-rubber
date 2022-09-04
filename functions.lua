@@ -71,8 +71,6 @@ function mcl_rubber.treetap_update_action(nodename)
 		local node = minetest.get_node({x=pos.x, y=pos.y, z=pos.z})
 		local back_offset = minetest.wallmounted_to_dir(node.param2)
 		local right_offset = {x=-back_offset.z, y=back_offset.y, z=back_offset.x}
-		biolib.debug_object("back_offset", back_offset)
-		biolib.debug_object("right_offset", right_offset)
 		
 		local neighbors = 0
 		
