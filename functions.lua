@@ -53,7 +53,7 @@ function mcl_rubber.rubber_sapling_grow_action(soil_needed, sapling, treelight)
 		if stage >= 3 then
 			meta:set_string("grown", "true")
 				-- If this sapling can grow alone
-			if mcl_core.check_growth_width(pos, 5, 11) then
+			if biolib.check_growth_width(pos, 5, 11) then
 				-- Single sapling
 				minetest.set_node(pos, {name="air"})
 				mcl_rubber.generate_rubber_tree(pos)

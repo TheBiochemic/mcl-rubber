@@ -30,6 +30,57 @@ function biolib.debug_object(text, obj)
 	biolib.debug(text..output)
 end
 
+-- Compat functions ------------------------------------------------------------
+
+-- compat function for check growth with, and make it compatible to games, that don't expose it
+if mcl_core ~= nil and mcl_core.check_growth_width ~= nil then
+	biolib.check_growth_width = mcl_core.check_growth_width
+else
+	biolib.check_growth_width = function (pos, width, height)
+		-- Huge tree (with even width to check) will check one more node in
+		-- positive x and y directions.
+		local neg_space = math.min((width - 1) / 2)
+		local pos_space = math.max((width - 1) / 2)
+		for x = -neg_space, pos_space do
+			for z = -neg_space, pos_space do
+				for y = 1, height do
+					local np = vector.new(
+						pos.x + x,
+						pos.y + y,
+						pos.z + z)
+					if biolib.node_stops_growth(minetest.get_node(np)) then
+						return false
+					end
+				end
+			end
+		end
+		return true
+	end
+
+	biolib.node_stops_growth = function (node)
+		if node.name == "air" then
+			return false
+		end
+	
+		local def = minetest.registered_nodes[node.name]
+		if not def then
+			return true
+		end
+	
+		local groups = def.groups
+		if not groups then
+			return true
+		end
+		if groups.plant or groups.torch or groups.dirt or groups.tree
+			or groups.bark or groups.leaves or groups.wood then
+			return false
+		end
+	
+		return true
+	end
+end
+
+
 -- Registry functions ----------------------------------------------------------
 
 local S = minetest.get_translator(minetest.get_current_modname())

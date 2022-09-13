@@ -1,5 +1,7 @@
-# Rubber Addon for MineClone 2 (MineTest)
+# Rubber Addon for MineClone 2
 by Biochemist
+
+[![ContentDB](https://content.minetest.net/packages/biochemist/mcl_rubber/shields/downloads/)](https://content.minetest.net/packages/biochemist/mcl_rubber/)
 
 ## Features
 - Adds a new Rubber Tree to the World, that you can find
