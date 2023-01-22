@@ -111,6 +111,7 @@ function biolib.register_tree_trunk(nodename, description_trunk, description_bar
 		_mcl_blast_resistance = 2,
 		_mcl_hardness = 2,
 		_mcl_stripped_variant = stripped_variant,
+		after_destruct = mcl_core.update_leaves,
 	})
 
 	minetest.register_node(nodename.."_bark", {
@@ -345,7 +346,7 @@ function biolib.register_leaves(nodename, description, longdesc, tiles, sapling,
 		return drop
 	end
 
-	minetest.register_node(nodename, {
+	local leaves_def = {
 		description = description,
 		_doc_items_longdesc = longdesc,
 		_doc_items_hidden = false,
@@ -357,7 +358,7 @@ function biolib.register_leaves(nodename, description, longdesc, tiles, sapling,
 		stack_max = 64,
 		groups = {
 			handy = 1, hoey = 1, shearsy = 1, swordy = 1, dig_by_piston = 1,
-			leaves = 1, leafdecay = 3, deco_block = 1,
+			leaves = 1, deco_block = 1,
 			flammable = 2, fire_encouragement = 30, fire_flammability = 60,
 			compostability = 30
 		},
@@ -368,7 +369,19 @@ function biolib.register_leaves(nodename, description, longdesc, tiles, sapling,
 		_mcl_hardness = 0.2,
 		_mcl_silk_touch_drop = true,
 		_mcl_fortune_drop = { get_drops(1), get_drops(2), get_drops(3), get_drops(4) },
-	})
+	}
+
+	local leaves_orphan_def = table.copy(leaves_def)
+
+	leaves_orphan_def._doc_items_create_entry = false
+	leaves_orphan_def.place_param2 = nil
+	leaves_orphan_def.groups.not_in_creative_inventory = 1
+	leaves_orphan_def.groups.orphan_leaves = 1
+	leaves_orphan_def._mcl_shears_drop = {nodename}
+	leaves_orphan_def._mcl_silk_touch_drop = {nodename}
+
+	minetest.register_node(nodename, leaves_def)
+	minetest.register_node(nodename.."_orphan", leaves_orphan_def)
 end
 
 -- Custom Sapling related Functions --------------------------------------------
