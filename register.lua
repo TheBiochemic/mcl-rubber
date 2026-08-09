@@ -145,8 +145,8 @@ biolib.register_leaves(
 	S("Rubber Tree leaves are grown from rubber trees."), 
 	{"mcl_rubber_leaves.png"}, 
 	"mcl_rubber:rubbersapling", 
-	{40, 26, 32, 24, 10}, 
-	{"mcl_rubber:rubber_raw", {200, 180, 160, 120, 40}})
+	{5, 4, 3, 2, 1}, 
+	{"mcl_rubber:rubber_raw", {20, 15, 10, 8, 4}})
 
 -- treetap stuff
 for i=0,4 do
