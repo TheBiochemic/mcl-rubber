@@ -65,10 +65,10 @@ minetest.register_tool("mcl_rubber:boots", {
 	_doc_items_usagehelp = mcl_armor.usage,
 	inventory_image = "mcl_rubber_boots_inv.png",
 	groups = {
-		armor = 1, 
-		combat_armor = 1, 
-		armor_boots = 1, 
-		mcl_armor_uses = 80, 
+		armor = 1,
+		combat_armor = 1,
+		armor_boots = 1,
+		mcl_armor_uses = 80,
 		fall_damage_add_percent = -60,
 		enchantability = 5,
 	},
@@ -93,74 +93,86 @@ minetest.register_craft({
 
 -- register rubber tree stuff
 biolib.register_tree_trunk(
-	"mcl_rubber:rubbertree", 
-	S("Rubber Wood"), 
-	S("Rubber Bark"), 
-	S("The trunk of a rubber tree."), 
-	"mcl_rubber_tree_top.png", 
-	"mcl_rubber_tree.png", 
+	"mcl_rubber:rubbertree",
+	S("Rubber Wood"),
+	S("Rubber Bark"),
+	S("The trunk of a rubber tree."),
+	"mcl_rubber_tree_top.png",
+	"mcl_rubber_tree.png",
 	"mcl_rubber:stripped_rubbertree")
 
 biolib.register_stripped_trunk(
-	"mcl_rubber:stripped_rubbertree", 
-	S("Stripped Rubber Wood Log"), 
-	S("Stripped Rubber Wood"), 
-	S("The stripped trunk of a rubber tree."), 
-	S("The stripped wood of an rubber tree."), 
-	"mcl_rubber_stripped_top.png", 
+	"mcl_rubber:stripped_rubbertree",
+	S("Stripped Rubber Wood Log"),
+	S("Stripped Rubber Wood"),
+	S("The stripped trunk of a rubber tree."),
+	S("The stripped wood of an rubber tree."),
+	"mcl_rubber_stripped_top.png",
 	"mcl_rubber_stripped.png")
 
 biolib.register_planks(
-	"mcl_rubber:rubberwood", 
-	S("Rubber Wood Planks"), 
+	"mcl_rubber:rubberwood",
+	S("Rubber Wood Planks"),
 	{"mcl_rubber_planks.png"})
 
 biolib.register_wooden_stairs(
-	"rubberwood", 
-	"mcl_rubber:rubberwood", 
-	"mcl_rubber_planks.png", 
-	S("Rubber Wood Stairs"), 
-	S("Rubber Wood Slab"), 
+	"rubberwood",
+	"mcl_rubber:rubberwood",
+	"mcl_rubber_planks.png",
+	S("Rubber Wood Stairs"),
+	S("Rubber Wood Slab"),
 	S("Double Rubber Wood Slab"))
 
 biolib.register_wooden_fence(
-	"rubberwood", 
-	"mcl_rubber:rubberwood", 
-	S("Rubber Wood Fence"), 
-	S("Rubber Wood Fence Gate"), 
+	"rubberwood",
+	"mcl_rubber:rubberwood",
+	S("Rubber Wood Fence"),
+	S("Rubber Wood Fence Gate"),
 	"mcl_rubber_fence.png")
 
 biolib.register_sapling(
-	"mcl_rubber:rubbersapling", 
+	"mcl_rubber:rubbersapling",
 	S("Rubber Tree Sapling"),
 	S("When placed on soil (such as dirt) and exposed to light, an rubber tree "
 		.."sapling will grow into a rubber tree after some time."),
 	S("Needs soil and light to grow"),
-	"mcl_rubber_sapling.png", 
+	"mcl_rubber_sapling.png",
 	{-4/16, -0.5, -4/16, 4/16, 0.5, 4/16})
 
 biolib.register_leaves(
-	"mcl_rubber:rubberleaves", 
-	S("Rubber Tree Leaves"), 
-	S("Rubber Tree leaves are grown from rubber trees."), 
-	{"mcl_rubber_leaves.png"}, 
-	"mcl_rubber:rubbersapling", 
-	{40, 26, 32, 24, 10}, 
-	{"mcl_rubber:rubber_raw", {200, 180, 160, 120, 40}})
+	"mcl_rubber:rubberleaves",
+	S("Rubber Tree Leaves"),
+	S("Rubber Tree leaves are grown from rubber trees."),
+	{"mcl_rubber_leaves.png"},
+	"mcl_rubber:rubbersapling",
+	{
+		40 * mcl_rubber.config.drop_mult,
+		26 * mcl_rubber.config.drop_mult,
+		32 * mcl_rubber.config.drop_mult,
+		24 * mcl_rubber.config.drop_mult,
+		10 * mcl_rubber.config.drop_mult
+	},
+	{"mcl_rubber:rubber_raw", {
+		200 * mcl_rubber.config.drop_mult,
+		180 * mcl_rubber.config.drop_mult,
+		160 * mcl_rubber.config.drop_mult,
+		120 * mcl_rubber.config.drop_mult,
+		40 * mcl_rubber.config.drop_mult
+	}})
 
 -- treetap stuff
 for i=0,4 do
 	biolib.register_treetap_variant(
-		"mcl_rubber:treetap", 
-		S("Treetap"), 
-		S("Collects Rubber Resin, when attached to rubber trees."), 
+		"mcl_rubber:treetap",
+		S("Treetap"),
+		S("Collects Rubber Resin, when attached to rubber trees."),
 		S("The treetap is a block, that gets attached to Rubber Trees to collect "
-			.."their resin, for creating Rubber."), 
+			.."their resin, for creating Rubber."),
 		S("Place the treetap next to the log of a rubber tree. This will attach "
 			.."the treetap, and allow it to collect resin over time. Make sure to "
 			.."not attach too many on it, because that will reduce the "
-			.."effectiveness. Rightclick for dropping the resin, when done."), 
-		"mcl_rubber_treetap", 
+			.."effectiveness. Rightclick for dropping the resin, when done."),
+		"mcl_rubber_treetap",
 		"mcl_rubber:rubbertree",
 		"mcl_rubber:rubber_raw",
 		i)
@@ -171,17 +183,17 @@ end
 
 local treetap_update_action = mcl_rubber.treetap_update_action("mcl_rubber:treetap")
 biolib.register_world_updates(
-	{"mcl_rubber:treetap", 
-		"mcl_rubber:treetap_1", 
-		"mcl_rubber:treetap_2", 
-		"mcl_rubber:treetap_3"}, 
-	{"mcl_rubber:rubbertree"}, 
-	"Treetap update", 
-	"Fills treetap in unloaded areas", 
-	"mcl_rubber:lbm_treetap", 
+	{"mcl_rubber:treetap",
+		"mcl_rubber:treetap_1",
+		"mcl_rubber:treetap_2",
+		"mcl_rubber:treetap_3"},
+	{"mcl_rubber:rubbertree"},
+	"Treetap update",
+	"Fills treetap in unloaded areas",
+	"mcl_rubber:lbm_treetap",
 	20, 15,
 	treetap_update_action)
-	
+
 minetest.register_craft({
 	output = "mcl_rubber:treetap",
 	recipe = {
@@ -195,21 +207,21 @@ minetest.register_craft({
 local rubber_sapling_grow = mcl_rubber.rubber_sapling_grow_action(1, "mcl_rubber:rubbersapling", 11)
 biolib.register_bonemeal_sapling("mcl_rubber:rubbersapling", rubber_sapling_grow)
 biolib.register_world_updates(
-	{"mcl_rubber:rubbersapling"}, 
-	{"group:soil_sapling"}, 
-	"Rubber tree growth", 
-	"Add growth for unloaded rubber tree", 
-	"mcl_rubber:lbm_rubber", 
-	25, 2, 
+	{"mcl_rubber:rubbersapling"},
+	{"group:soil_sapling"},
+	"Rubber tree growth",
+	"Add growth for unloaded rubber tree",
+	"mcl_rubber:lbm_rubber",
+	25, 2,
 	rubber_sapling_grow)
-	
+
 for i=1,3 do
 
 	minetest.register_decoration({
 	    deco_type = "schematic",
 	    place_on = {"group:soil_sapling"},
 	    sidelen = 16,
-	    fill_ratio = 0.00007,
+	    fill_ratio = 0.00007 * mcl_rubber.config.tree_chances,
 	    biomes = {"Forest", "Jungle", "JungleM", "JungleEdge"},
 	    y_max = 200,
 	    y_min = 1,
@@ -222,7 +234,7 @@ for i=1,3 do
 	    deco_type = "schematic",
 	    place_on = {"group:soil_sapling"},
 	    sidelen = 16,
-	    fill_ratio = 0.0000003,
+	    fill_ratio = 0.0000003 * mcl_rubber.config.tree_chances,
 	    biomes = {"Plains"},
 	    y_max = 200,
 	    y_min = 1,
@@ -231,9 +243,7 @@ for i=1,3 do
 	    rotation = "random",
 	})
 end
-	
-	
+
+
 -- register event based stuff
 minetest.register_on_player_hpchange(biolib.do_modify_falldamage_with_boots, true)
-	
-	

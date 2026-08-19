@@ -15,7 +15,8 @@ by Biochemist
 ## Notes
 - it is a mod designed to run with MineClone2, and extends it's gameplay
 - if you want to make sure, that your mod is compatible with this one, you can just use *group:rubber* in your crafting recipes for one piece of rubber.
-- it also uses an internal library, that will be split of eventually, but for now it's part of it; One less dependency to worry about for you.
+- it also uses an internal library, that will be split off eventually, but for now it's part of it; One less dependency to worry about for you.
+- once installed, you can configure the mod to your liking using the config options in the settings screen.
 
 ## Usage
 - you can download the zip file from here, and then just unpack it into your mods folder. In your mods folder now should be a folder called mcl-rubber (potentially rename it to mcl_rubber, because i don't know it it will just work)

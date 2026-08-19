@@ -1,0 +1,11 @@
+# Determines, how likely a sapling or raw rubber drops from rubber tree leaves (higher is more likely)
+mcl_rubber.drop_chances (Rubber Tree Leaves Drop Chance) float 1.0
+
+# How high is the spawn rate of Rubber trees in the various biomes (higher is more trees)
+mcl_rubber.tree_chances (Rubber Tree Spawn Chance) float 1.0
+
+# Enables wood blocks from rubber trees (such as planks, stairs, fence)
+mcl_rubber.use_planks (Rubber Tree Planks) bool true
+
+# Enables extra rubber items and blocks (rubber block, boots)
+mcl_rubber.use_rubber_products (Rubber Products) bool true
