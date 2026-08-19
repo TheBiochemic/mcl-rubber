@@ -4,17 +4,99 @@ local modpath = minetest.get_modpath(minetest.get_current_modname())
 
 -- Main Part of the Mod --------------------------------------------------------
 
-minetest.register_node("mcl_rubber:rubberblock", {
-	description = S("Rubber Block"),
-	_doc_items_longdesc = S("Rubber blocks are bouncy and prevent fall damage."),
-	is_ground_content = false,
-	tiles = {"mcl_rubber_block.png"},
-	stack_max = 64,
-	groups = {dig_immediate=3, bouncy=55,fall_damage_add_percent=-100,deco_block=1},
-	sounds = mcl_sounds.node_sound_wood_defaults(),
-	_mcl_blast_resistance = 1.5,
-	_mcl_hardness = 1.5,
-})
+-- Definitions for all rubber products -----------------------------------------
+if mcl_rubber.config.use_rubber_products then
+
+	minetest.register_node("mcl_rubber:rubberblock", {
+		description = S("Rubber Block"),
+		_doc_items_longdesc = S("Rubber blocks are bouncy and prevent fall damage."),
+		is_ground_content = false,
+		tiles = {"mcl_rubber_block.png"},
+		stack_max = 64,
+		groups = {dig_immediate=3, bouncy=55,fall_damage_add_percent=-100,deco_block=1},
+		sounds = mcl_sounds.node_sound_wood_defaults(),
+		_mcl_blast_resistance = 1.5,
+		_mcl_hardness = 1.5,
+	})
+
+	minetest.register_craft({
+		output = "mcl_rubber:rubber 9",
+		recipe = {{"mcl_rubber:rubberblock"}},
+	})
+
+	minetest.register_craft({
+		output = "mcl_rubber:rubberblock",
+		recipe = {{"group:rubber","group:rubber","group:rubber",},
+			{"group:rubber","group:rubber","group:rubber",},
+			{"group:rubber","group:rubber","group:rubber",}},
+	})
+
+	-- register rubber boots
+	minetest.register_tool("mcl_rubber:boots", {
+		description = S("Rubber Boots"),
+		_doc_items_longdesc = mcl_armor.longdesc,
+		_doc_items_usagehelp = mcl_armor.usage,
+		inventory_image = "mcl_rubber_boots_inv.png",
+		groups = {
+			armor = 1,
+			combat_armor = 1,
+			armor_boots = 1,
+			mcl_armor_uses = 80,
+			fall_damage_add_percent = -60,
+			enchantability = 5,
+		},
+		sounds = {
+			_mcl_armor_equip = "mcl_armor_equip_leather",
+			_mcl_armor_unequip = "mcl_armor_unequip_leather",
+		},
+		on_place = mcl_armor.equip_on_use,
+		on_secondary_use = mcl_armor.equip_on_use,
+		_mcl_armor_element = "feet",
+		_mcl_armor_texture = "mcl_rubber_boots.png"
+	})
+
+	minetest.register_craft({
+		output = "mcl_rubber:boots",
+		recipe = {
+			{"group:rubber", "", "group:rubber"},
+			{"group:rubber", "", "group:rubber"},
+		},
+	})
+
+	-- add event for falldamage changes with boots
+	minetest.register_on_player_hpchange(biolib.do_modify_falldamage_with_boots, true)
+
+end
+
+-- Definitions for rubber tree planks ------------------------------------------
+if mcl_rubber.config.use_planks then
+	biolib.register_planks(
+		"mcl_rubber:rubberwood",
+		S("Rubber Wood Planks"),
+		{"mcl_rubber_planks.png"})
+
+	biolib.register_wooden_stairs(
+		"rubberwood",
+		"mcl_rubber:rubberwood",
+		"mcl_rubber_planks.png",
+		S("Rubber Wood Stairs"),
+		S("Rubber Wood Slab"),
+		S("Double Rubber Wood Slab"))
+
+	biolib.register_wooden_fence(
+		"rubberwood",
+		"mcl_rubber:rubberwood",
+		S("Rubber Wood Fence"),
+		S("Rubber Wood Fence Gate"),
+		"mcl_rubber_fence.png")
+
+		minetest.register_craft({
+			output = "mcl_rubber:rubberwood 4",
+			recipe = {{"mcl_rubber:rubbertree"}}
+		})
+end
+
+-- All other definitions -------------------------------------------------------
 
 minetest.register_craftitem("mcl_rubber:rubber_raw", {
 	description = S("Rubber Resin"),
@@ -39,57 +121,11 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = "mcl_rubber:rubber 9",
-	recipe = {{"mcl_rubber:rubberblock"}},
-})
-
-minetest.register_craft({
-	output = "mcl_rubber:rubberblock",
-	recipe = {{"group:rubber","group:rubber","group:rubber",},
-		{"group:rubber","group:rubber","group:rubber",},
-		{"group:rubber","group:rubber","group:rubber",}},
-})
-
-minetest.register_craft({
 	type = "cooking",
 	output = "mcl_rubber:rubber",
 	recipe = "mcl_rubber:rubber_raw",
 	cooktime = 10,
 })
-
-
--- register rubber boots
-minetest.register_tool("mcl_rubber:boots", {
-	description = S("Rubber Boots"),
-	_doc_items_longdesc = mcl_armor.longdesc,
-	_doc_items_usagehelp = mcl_armor.usage,
-	inventory_image = "mcl_rubber_boots_inv.png",
-	groups = {
-		armor = 1,
-		combat_armor = 1,
-		armor_boots = 1,
-		mcl_armor_uses = 80,
-		fall_damage_add_percent = -60,
-		enchantability = 5,
-	},
-	sounds = {
-		_mcl_armor_equip = "mcl_armor_equip_leather",
-		_mcl_armor_unequip = "mcl_armor_unequip_leather",
-	},
-	on_place = mcl_armor.equip_on_use,
-	on_secondary_use = mcl_armor.equip_on_use,
-	_mcl_armor_element = "feet",
-	_mcl_armor_texture = "mcl_rubber_boots.png"
-})
-
-minetest.register_craft({
-	output = "mcl_rubber:boots",
-	recipe = {
-		{"group:rubber", "", "group:rubber"},
-		{"group:rubber", "", "group:rubber"},
-	},
-})
-
 
 -- register rubber tree stuff
 biolib.register_tree_trunk(
@@ -109,26 +145,6 @@ biolib.register_stripped_trunk(
 	S("The stripped wood of an rubber tree."),
 	"mcl_rubber_stripped_top.png",
 	"mcl_rubber_stripped.png")
-
-biolib.register_planks(
-	"mcl_rubber:rubberwood",
-	S("Rubber Wood Planks"),
-	{"mcl_rubber_planks.png"})
-
-biolib.register_wooden_stairs(
-	"rubberwood",
-	"mcl_rubber:rubberwood",
-	"mcl_rubber_planks.png",
-	S("Rubber Wood Stairs"),
-	S("Rubber Wood Slab"),
-	S("Double Rubber Wood Slab"))
-
-biolib.register_wooden_fence(
-	"rubberwood",
-	"mcl_rubber:rubberwood",
-	S("Rubber Wood Fence"),
-	S("Rubber Wood Fence Gate"),
-	"mcl_rubber_fence.png")
 
 biolib.register_sapling(
 	"mcl_rubber:rubbersapling",
@@ -243,7 +259,3 @@ for i=1,3 do
 	    rotation = "random",
 	})
 end
-
-
--- register event based stuff
-minetest.register_on_player_hpchange(biolib.do_modify_falldamage_with_boots, true)

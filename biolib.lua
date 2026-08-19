@@ -61,12 +61,12 @@ else
 		if node.name == "air" then
 			return false
 		end
-	
+
 		local def = minetest.registered_nodes[node.name]
 		if not def then
 			return true
 		end
-	
+
 		local groups = def.groups
 		if not groups then
 			return true
@@ -75,7 +75,7 @@ else
 			or groups.bark or groups.leaves or groups.wood then
 			return false
 		end
-	
+
 		return true
 	end
 end
@@ -97,13 +97,15 @@ end
 -- tile_bark is the texture for the bark part
 -- stripped_variant is the node name for the stripped variant
 function biolib.register_tree_trunk(nodename, description_trunk, description_bark, longdesc, tile_inner, tile_bark, stripped_variant)
-	minetest.register_node(nodename, {
+  minetest.register_node(nodename, {
 		description = description_trunk,
 		_doc_items_longdesc = longdesc,
 		_doc_items_hidden = false,
 		tiles = {tile_inner, tile_inner, tile_bark},
 		paramtype2 = "facedir",
+		is_ground_content = false,
 		on_place = mcl_util.rotate_axis,
+		after_destruct = mcl_core.update_leaves,
 		stack_max = 64,
 		groups = {handy=1,axey=1, tree=1, flammable=2, building_block=1, material_wood=1, fire_encouragement=5, fire_flammability=5},
 		sounds = mcl_sounds.node_sound_wood_defaults(),
@@ -118,6 +120,7 @@ function biolib.register_tree_trunk(nodename, description_trunk, description_bar
 		_doc_items_longdesc = S("This is a decorative block surrounded by the bark of a tree trunk."),
 		tiles = {tile_bark},
 		paramtype2 = "facedir",
+		is_ground_content = false,
 		on_place = mcl_util.rotate_axis,
 		stack_max = 64,
 		groups = {handy=1,axey=1, bark=1, flammable=2, building_block=1, material_wood=1, fire_encouragement=5, fire_flammability=5},
@@ -152,6 +155,7 @@ function biolib.register_stripped_trunk(nodename, description_stripped_trunk, de
 		_doc_items_hidden = false,
 		tiles = {tile_stripped_inner, tile_stripped_inner, tile_stripped_bark},
 		paramtype2 = "facedir",
+    is_ground_content = false,
 		on_place = mcl_util.rotate_axis,
 		stack_max = 64,
 		groups = {handy=1, axey=1, tree=1, flammable=2, building_block=1, material_wood=1, fire_encouragement=5, fire_flammability=5},
@@ -166,6 +170,7 @@ function biolib.register_stripped_trunk(nodename, description_stripped_trunk, de
 		_doc_items_longdesc = longdesc_wood,
 		tiles = {tile_stripped_bark},
 		paramtype2 = "facedir",
+    is_ground_content = false,
 		on_place = mcl_util.rotate_axis,
 		stack_max = 64,
 		groups = {handy=1, axey=1, bark=1, flammable=2, building_block=1, material_wood=1, fire_encouragement=5, fire_flammability=5},
@@ -217,7 +222,7 @@ function biolib.register_wooden_stairs(name, nodename, texture, stairs_name, sla
 			stairs_name,
 			mcl_sounds.node_sound_wood_defaults(), 3, 2,
 			"woodlike")
-			
+
 	mcl_stairs.register_slab(name, nodename,
 			{handy=1,axey=1, flammable=3,wood_slab=1, material_wood=1, fire_encouragement=5, fire_flammability=20},
 			{texture},
@@ -240,7 +245,7 @@ function biolib.register_wooden_fence(name, nodename, fence_name, fence_gate_nam
 	local id = name.."_fence"
 	local mod_id = nodename.."_fence"
 	local mod_id_gate = nodename.."_fence_gate"
-	
+
 	mcl_fences.register_fence_and_fence_gate(id, fence_name, fence_gate_name, fence_tex, wood_groups, 2, 15, wood_connect, wood_sounds)
 
 	minetest.register_craft({
@@ -319,7 +324,7 @@ end
 -- additional_drop is an additional drop {name, drop_chances}. If none given, drops sticks
 function biolib.register_leaves(nodename, description, longdesc, tiles, sapling, sapling_chances, additional_drop)
 	local stick_chances = {50, 45, 30, 35, 10}
-	
+
 	if additional_drop == nil then
 		additional_drop = {"mcl_core:stick 2", stick_chances}
 	end
@@ -345,21 +350,20 @@ function biolib.register_leaves(nodename, description, longdesc, tiles, sapling,
 		return drop
 	end
 
-	minetest.register_node(nodename, {
+	local leaves_def = {
 		description = description,
 		_doc_items_longdesc = longdesc,
 		_doc_items_hidden = false,
 		drawtype = "allfaces_optional",
 		waving = 2,
-		place_param2 = 1, -- Prevent leafdecay for placed nodes
 		tiles = tiles,
 		paramtype = "light",
+    is_ground_content = false,
 		stack_max = 64,
 		groups = {
 			handy = 1, hoey = 1, shearsy = 1, swordy = 1, dig_by_piston = 1,
-			leaves = 1, leafdecay = 3, deco_block = 1,
-			flammable = 2, fire_encouragement = 30, fire_flammability = 60,
-			compostability = 30
+			leaves = 1, deco_block = 1, flammable = 2, fire_encouragement = 30,
+      fire_flammability = 60, compostability = 30
 		},
 		drop = get_drops(0),
 		_mcl_shears_drop = true,
@@ -368,7 +372,21 @@ function biolib.register_leaves(nodename, description, longdesc, tiles, sapling,
 		_mcl_hardness = 0.2,
 		_mcl_silk_touch_drop = true,
 		_mcl_fortune_drop = { get_drops(1), get_drops(2), get_drops(3), get_drops(4) },
-	})
+    after_place_node = function(pos)
+			mcl_core.make_player_leaves(pos) -- Leaves placed by the player should always be player leaves.
+		end,
+	}
+
+  minetest.register_node(nodename, leaves_def)
+
+  local leaves_orphan_def = table.copy(leaves_def)
+	leaves_orphan_def._doc_items_create_entry = false
+	leaves_orphan_def.groups.not_in_creative_inventory = 1
+	leaves_orphan_def.groups.orphan_leaves = 1
+	leaves_orphan_def._mcl_shears_drop = {nodename}
+	leaves_orphan_def._mcl_silk_touch_drop = {nodename}
+
+  minetest.register_node(nodename .. "_orphan", leaves_orphan_def)
 end
 
 -- Custom Sapling related Functions --------------------------------------------
@@ -387,7 +405,7 @@ function biolib.__grow_sapling(pos, node)
 			return false
 		end
 	end
-		
+
 	return biolib.__orig_grow_sapling(pos, node)
 end
 
@@ -450,18 +468,18 @@ end
 -- final_drop is the drop that you get, when the treetap is filled
 -- fill_level is the incremental value of what the fill level is.
 function biolib.register_treetap_variant(nodename, description, help, long_desc, usage, resource_name, attach_name, final_drop, fill_level)
-	
+
 	local indexed_nodename = nodename
 	local indexed_resource_name = resource_name
-	
+
 	if fill_level > 0 then
 		indexed_nodename = nodename.."_"..fill_level
 		indexed_resource_name = resource_name.."_"..fill_level
 	end
-	
+
 	local groups = {}
 	local config = {}
-	
+
 	-- general data
 	config.stack_max = 64
 	if fill_level > 0 then
@@ -473,7 +491,7 @@ function biolib.register_treetap_variant(nodename, description, help, long_desc,
 		config._doc_items_longdesc = long_desc
 		config._doc_items_usagehelp = usage
 	end
-	
+
 	-- graphics related date
 	config.drawtype = "mesh"
 	config.mesh = indexed_resource_name..".obj"
@@ -486,7 +504,7 @@ function biolib.register_treetap_variant(nodename, description, help, long_desc,
 		type = "fixed",
 		fixed = {-0.2, -0.5, -0.2, 0.2, -0.1, 0.2}
 	}
-	
+
 	-- node related data
 	config._mcl_blast_resistance = 1.3
 	config._mcl_hardness = 0.7
@@ -499,26 +517,26 @@ function biolib.register_treetap_variant(nodename, description, help, long_desc,
 		type = "fixed",
 		fixed = {-0.2, -0.5, -0.2, 0.2, -0.1, 0.2}
 	}
-	
+
 	-- sound related stuff
 	config.sounds = mcl_sounds.node_sound_wood_defaults()
-	
+
 	-- placement related config
 	config.node_placement_prediction = ""
 	config.liquids_pointable = false
 	if fill_level == 0 then
 		config.on_place = function(itemstack, placer, pointed_at)
-		
+
 			-- there is nothing pointed at
 			if pointed_at.type ~= "node" then
 				return itemstack
 			end
-			
+
 			local under = pointed_at.under
 			local node = minetest.get_node(under)
 			local def = minetest.registered_nodes[node.name]
 			if not def then return itemstack end
-			
+
 			-- there is something pointed at, but it's this specific node
 			if node.name ~= attach_name then
 				return itemstack
@@ -530,41 +548,41 @@ function biolib.register_treetap_variant(nodename, description, help, long_desc,
 					return minetest.registered_nodes[node.name].on_rightclick(under, node, placer, itemstack) or itemstack
 				end
 			end
-			
+
 			local above = pointed_at.above
 			local wdir = minetest.dir_to_wallmounted({x = under.x - above.x, y = under.y - above.y, z = under.z - above.z})
 			if biolib._check_placement_allowed(node, wdir) == false then
 				return itemstack
 			end
-			
+
 			if wdir == 1 or wdir == 0 then
 				return itemstack
 			end
-			
+
 			local success
 			itemstack, success = minetest.item_place(itemstack, placer, pointed_at, wdir)
-			
+
 			if success and config.sounds and config.sounds.place then
 				minetest.sound_play(config.sounds.place, {pos=under, gain=1}, true)
 			end
 			return itemstack
 		end
 	end
-	
+
 	if fill_level == 4 then
 		config.on_rightclick = function(pos, node, player, itemstack)
 			if not player:get_player_control().sneak then
 				local new_stack = ItemStack(final_drop)
 				local random_pos = {x=pos.x+math.random(0, 10)/10-0.5, y=pos.y, z=pos.z+math.random(0, 10)/10-0.5}
 				local new_node = {name = nodename, param1 = node.param1, param2 = node.param2}
-				
+
 				minetest.add_item(pos, new_stack)
 				minetest.swap_node(pos, new_node)
 			end
 			return itemstack
 		end
 	end
-	
+
 	-- misc config stuff
 	config.on_rotate = false
 	config.paramtype = "light"
@@ -572,7 +590,7 @@ function biolib.register_treetap_variant(nodename, description, help, long_desc,
 	config.sunlight_propagates = true
 	config.is_ground_content = false
 	config.drop = nodename
-	
+
 	-- other group related stuff
 	groups.attached_node = 1
 	groups.dig_by_water = 1
@@ -580,9 +598,9 @@ function biolib.register_treetap_variant(nodename, description, help, long_desc,
 	groups.dig_by_piston = 1
 	groups.resin_fill = fill_level
 	groups.treetap = 1
-	
+
 	config.groups = groups
-	
+
 	minetest.register_node(indexed_nodename, config)
 end
 
@@ -597,23 +615,23 @@ end
 function biolib.register_world_updates(nodenames, depends_on, abm_label, lbm_label, lbm_name, interval, chance, update_func)
 	local config_abm = {}
 	local config_lbm = {}
-	
+
 	config_abm.label = abm_label
 	config_lbm.label = lbm_label
 	config_abm.nodenames = nodenames
 	config_abm.nodenames = nodenames
 	config_lbm.name = lbm_name
-	
+
 	if depends_on then
 		config_abm.neighbors = depends_on
 	end
-	
+
 	config_abm.interval = interval
 	config_abm.chance = chance
 	config_abm.action = update_func
 	config_lbm.action = update_func
 	config_lbm.run_at_every_load = true
-	
+
 	minetest.register_abm(config_abm)
 	minetest.register_lbm(config_lbm)
 end
@@ -639,6 +657,3 @@ function biolib.do_modify_falldamage_with_boots(player, hp_change, mt_reason)
 	end
 	return hp_change
 end
-
-
-
