@@ -3,6 +3,8 @@ by Biochemist
 
 [![ContentDB](https://content.minetest.net/packages/biochemist/mcl_rubber/shields/downloads/)](https://content.minetest.net/packages/biochemist/mcl_rubber/)
 
+![Screenshot](screenshot.png)
+
 ## Features
 - Adds a new Rubber Tree to the World, that you can find
 - This tree can be cut down, and made into Planks, Stairs and Slabs
