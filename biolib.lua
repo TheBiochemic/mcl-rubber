@@ -113,6 +113,7 @@ function biolib.register_tree_trunk(nodename, description_trunk, description_bar
 		_mcl_blast_resistance = 2,
 		_mcl_hardness = 2,
 		_mcl_stripped_variant = stripped_variant,
+		after_destruct = mcl_core.update_leaves,
 	})
 
 	minetest.register_node(nodename.."_bark", {
